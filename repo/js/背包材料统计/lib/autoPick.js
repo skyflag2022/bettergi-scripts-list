@@ -31,18 +31,31 @@ function readtargetTextCategories(targetTextDir) {
     const targetTextFilePaths = readAllFilePaths(targetTextDir, 0, 1);
     const materialCategories = {};
 
+    // 解析筛选名单
+    const pickTextNames = (settings.PickCategories || "")
+        .split(/[,，、 \s]+/).map(n => n.trim()).filter(n => n);
+
+    // 【新增：兜底日志】确认pickTextNames是否为空，方便排查
+    log.info(`筛选名单状态：${pickTextNames.length === 0 ? '未指定（空），将加载所有文件' : '指定了：' + pickTextNames.join(',')}`);
+
     for (const filePath of targetTextFilePaths) {
         if (state.cancelRequested) break;
         const content = file.readTextSync(filePath);
         if (!content) {
             log.error(`加载文件失败：${filePath}`);
-            continue; // 跳过当前文件
+            continue;
         }
 
         const sourceCategory = basename(filePath).replace('.txt', ''); // 去掉文件扩展名
+        // 【核心筛选：空名单直接跳过判断，加载所有】
+        if (pickTextNames.length === 0) {
+            // 空名单时，直接保留当前文件，不跳过
+        } else if (!pickTextNames.includes(sourceCategory)) {
+            // 非空名单且不在列表里，才跳过
+            continue;
+        }
         materialCategories[sourceCategory] = parseCategoryContent(content);
     }
-    // log.info(`完成材料分类信息读取，分类信息：${JSON.stringify(materialCategories, null, 2)}`);
     return materialCategories;
 }
 // 定义替换映射表
@@ -145,46 +158,61 @@ async function findFIcon(recognitionObject, timeout = 10, ra = null) {
                 return { success: true, x: result.x, y: result.y, width: result.width, height: result.height };
             }
         } catch (error) {
-            log.error(`识别图像时发生异常: ${error.message}`);
+            log.error(`识别图标异常: ${error.message}`);
             if (state.cancelRequested) {
-                break; // 如果请求了取消，则退出循环
+                break;
             }
             return null;
         }
         await sleep(5); // 每次检测间隔 5 毫秒
     }
     if (state.cancelRequested) {
-        log.info("图像识别任务已取消");
+        log.info("图标识别任务已取消");
     }
     return null;
 }
 
-// 对齐并交互目标
-async function alignAndInteractTarget(targetTexts, fDialogueRo, textxRange, texttolerance, cachedFrame=null) {
+// 定义Scroll.png识别对象（按需求使用TemplateMatch，包含指定范围）
+const ScrollRo = RecognitionObject.TemplateMatch(
+    file.ReadImageMatSync("assets/Scroll.png"), 
+    1055, 521, 15, 35  // 识别范围：x=1055, y=521, width=15, height=35
+);
+
+/**
+ * 对齐并交互目标（直接用findFIcon识别Scroll.png）
+ * @param {string[]} targetTexts - 待匹配的目标文本列表
+ * @param {Object} fDialogueRo - F图标的识别对象
+ * @param {Object} textxRange - 文本识别的X轴范围 { min: number, max: number }
+ * @param {number} texttolerance - 文本与F图标Y轴对齐的容差
+ * @param {Object} cachedFrame - 缓存的图像帧（可选）
+ */
+async function alignAndInteractTarget(targetTexts, fDialogueRo, textxRange, texttolerance, cachedFrame = null) {
     let lastLogTime = Date.now();
     // 记录每个材料的识别次数（文本+坐标 → 计数）
     const recognitionCount = new Map();
 
     while (!state.completed && !state.cancelRequested) {
         const currentTime = Date.now();
-        if (currentTime - lastLogTime >= 10000) { // 每5秒记录一次日志
+        if (currentTime - lastLogTime >= 10000) {
             log.info("检测中...");
             lastLogTime = currentTime;
         }
-        await sleep(50); // 关键50时可避免F多目标滚动中拾取错，背包js这边有弹窗模块，就没必要增加延迟降低效率了
+        await sleep(50);
         cachedFrame?.dispose();
         cachedFrame = captureGameRegion();
 
         // 尝试找到 F 图标
         let fRes = await findFIcon(fDialogueRo, 10, cachedFrame);
         if (!fRes) {
-            continue;
+            const scrollRes = await findFIcon(ScrollRo, 10, cachedFrame); // 复用findFIcon函数
+            if (scrollRes) {
+                await keyMouseScript.runFile(`assets/滚轮下翻.json`); // 调用翻滚脚本
+            }
+            continue; // 继续下一轮检测
         }
 
         // 获取 F 图标的中心点 Y 坐标
         let centerYF = fRes.y + fRes.height / 2;
-
-        // 在当前屏幕范围内进行 OCR 识别
         let ocrResults = await performOcr(targetTexts, textxRange, { min: fRes.y - 3, max: fRes.y + 37 }, 10, cachedFrame);
 
         // 检查所有目标文本是否在当前页面中
@@ -192,33 +220,26 @@ async function alignAndInteractTarget(targetTexts, fDialogueRo, textxRange, text
         for (let targetText of targetTexts) {
             let targetResult = ocrResults.find(res => res.text.includes(targetText));
             if (targetResult) {
-                log.info(`找到目标文本: ${targetText}`);
                 
-                // 生成唯一标识并更新识别计数（文本+Y坐标）
                 const materialId = `${targetText}-${targetResult.y}`;
                 recognitionCount.set(materialId, (recognitionCount.get(materialId) || 0) + 1);
                 
                 let centerYTargetText = targetResult.y + targetResult.height / 2;
                 if (Math.abs(centerYTargetText - centerYF) <= texttolerance) {
-                    // log.info(`目标文本 '${targetText}' 和 F 图标水平对齐`);
                     if (recognitionCount.get(materialId) >= 1) {
-                        keyPress("F"); // 执行交互操作
-                        // log.info(`F键执行成功，识别计数: ${recognitionCount.get(materialId)}`);
-                        
-                        // F键后清除计数，确保单次交互
+                        keyPress("F");
+                        log.info(`交互或拾取: ${targetText}`);
                         recognitionCount.delete(materialId);
                     }
                     
                     foundTarget = true;
-                    break; // 成功交互后退出当前循环，但继续检测
+                    break;
                 }
             }
         }
 
-        // 如果在当前页面中没有找到任何目标文本，则滚动到下一页
         if (!foundTarget) {
             await keyMouseScript.runFile(`assets/滚轮下翻.json`);
-            // verticalScroll(-20);
         }
         if (state.cancelRequested) {
             break;

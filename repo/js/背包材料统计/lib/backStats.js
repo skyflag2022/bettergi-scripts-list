@@ -3,7 +3,6 @@ eval(file.readTextSync("lib/region.js"));
 const holdX = Math.min(1920, Math.max(0, Math.floor(Number(settings.HoldX) || 1050)));
 const holdY = Math.min(1080, Math.max(0, Math.floor(Number(settings.HoldY) || 750)));
 const totalPageDistance = Math.max(10, Math.floor(Number(settings.PageScrollDistance) || 711));
-const targetCount = Math.min(9999, Math.max(0, Math.floor(Number(settings.TargetCount) || 5000))); // 设定的目标数量
 const imageDelay = Math.min(1000, Math.max(0, Math.floor(Number(settings.ImageDelay) || 0))); // 识图基准时长    await sleep(imageDelay);
 
 // 配置参数
@@ -57,7 +56,7 @@ const materialPriority = {
 // log.info(`材料分类: ${materialsCategory}, 菜单偏移值: ${menuOffset}, 计算出的点击 X 坐标: ${menuClickX}`);
 
 // OCR识别文本
-async function recognizeText(ocrRegion, timeout = 1000, retryInterval = 20, maxAttempts = 10, maxFailures = 3, ra = null) {
+async function recognizeText(ocrRegion, timeout = 100, retryInterval = 20, maxAttempts = 10, maxFailures = 3, ra = null) {
     let startTime = Date.now();
     let retryCount = 0;
     let failureCount = 0; // 用于记录连续失败的次数
@@ -383,7 +382,7 @@ async function scanMaterials(materialsCategory, materialCategoryMap) {
                             width: 66 + 2 * tolerance,
                             height: 22 + 2 * tolerance
                         };
-                        const ocrResult = await recognizeText(ocrRegion, 1000, 10, 10, 3, ra);
+                        const ocrResult = await recognizeText(ocrRegion, 200, 10, 5, 2, ra);
                         materialInfo.push({ name, count: ocrResult || "?" });
 
                         if (!hasFoundFirstMaterial) {
@@ -508,33 +507,6 @@ const MaterialsRo = RecognitionObject.TemplateMatch(file.ReadImageMatSync("asset
 const CultivationItemsRo = RecognitionObject.TemplateMatch(file.ReadImageMatSync("assets/CultivationItems.png"), 749, 30, 38, 38);
 const FoodRo = RecognitionObject.TemplateMatch(file.ReadImageMatSync("assets/Food.png"), 845, 31, 38, 38);
 
-const specialMaterials = [
-    "水晶块", "魔晶块", "星银矿石", "紫晶块", "萃凝晶", "铁块", "白铁块",
-    "精锻用魔矿", "精锻用良矿", "精锻用杂矿"
-];
-function filterLowCountMaterials(pathingMaterialCounts, materialCategoryMap) {
-    // 将 materialCategoryMap 中的所有材料名提取出来
-    const allMaterials = Object.values(materialCategoryMap).flat();
-
-    // 筛选 pathingMaterialCounts 中的材料，只保留 materialCategoryMap 中定义的材料，并且数量低于 targetCount 或 count 为 "?" 或 name 在 specialMaterials 中
-    return pathingMaterialCounts
-        .filter(item =>
-            allMaterials.includes(item.name) &&
-            (item.count < targetCount || item.count === "?")
-        )
-        .map(item => {
-            // 如果 name 在 specialMaterials 数组中
-            if (specialMaterials.includes(item.name)) {
-                // 如果 count 是 "?"，直接保留
-                if (item.count === "?") {
-                    return item;
-                }
-                // 否则，将 count 除以 10 并向下取整
-                item.count = Math.floor(item.count / 10);
-            }
-            return item;
-        });
-}
 
 function dynamicMaterialGrouping(materialCategoryMap) {
     // 初始化动态分组对象
