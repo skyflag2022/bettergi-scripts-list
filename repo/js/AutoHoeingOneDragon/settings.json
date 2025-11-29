@@ -65,7 +65,7 @@
   {
     "name": "timeMove",
     "type": "input-text",
-    "label": "单次滚动周期(毫秒)\n观察到滚动不全时建议调大",
+    "label": "单次滚动周期(毫秒)\n观察到上下滚动不全时建议调大",
     "default": "1000"
   },
   {
@@ -81,7 +81,7 @@
   {
     "name": "timeRule",
     "type": "input-text",
-    "label": "输入不运行的时间或时间段的小时数，以本地时间为准\n将提前结束路线运行，并等待到对应时间\n允许填入【单个数字】如4表示小时数为4时不运行\n或【时间段】如4-6表示小时数为4-6时都不运行\n允许多项，由【中文逗号】分隔"
+    "label": "本地时间-不运行时段\n示例写法：\n  单个小时：8\n  连续区间：8-11 或 23:11-23:55（可省略分钟）\n  多项分隔：用中文逗号【，】\n规则：\n  只写小时：开始=整点，结束=59分；跨天自动识别\n  含分钟：按实际时分计算\n  提前10分钟结束并等待到限制时段开始\n留空=全天可运行"
   },
   {
     "name": "accountName",
@@ -111,15 +111,22 @@
     "label": "路径组四要【选择】的标签"
   },
   {
-    "name": "efficiencyIndex",
+    "name": "eEfficiencyIndex",
     "type": "input-text",
-    "label": "路线效率计算权重，填0以上的数字\n越大越倾向于花费较多时间提高总收益",
+    "label": "精英计算权重，填0以上的数字\n越大越倾向于花费较多时间提高总收益",
+    "default": "2.5"
+  },
+  {
+    "name": "mEfficiencyIndex",
+    "type": "input-text",
+    "label": "小怪计算权重，填0以上的数字\n越大越倾向于花费较多时间提高总收益",
     "default": "0.5"
   },
   {
-    "name": "disableSelfOptimization",
-    "type": "checkbox",
-    "label": "勾选后禁用根据运行记录优化路线选择的功能\n完全使用路线原有信息"
+    "name": "splitFactor",
+    "type": "input-text",
+    "label": "精英小怪分离系数，填0-1数字\n越大越倾向于分离出更多的纯小怪路线\n总耗时大幅增加，但是有利于小怪路线蹭更多经验\n建议保持默认即可",
+    "default": "0"
   },
   {
     "name": "targetEliteNum",
