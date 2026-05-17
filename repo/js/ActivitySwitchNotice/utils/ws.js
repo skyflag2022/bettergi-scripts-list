@@ -1,3 +1,5 @@
+import {ocrUID} from "./uid";
+
 const actionType = Object.freeze({
     send_private_msg: 'send_private_msg',//私聊
     send_group_msg: 'send_group_msg',//群聊
@@ -41,7 +43,32 @@ let configWs = {
     ws_token: settings.ws_token,
     at_list: settings.at_list ? settings.at_list.split(",") : []
 }
+let local = {
+    token: null,
+    uid: null,
+}
 
+/**
+ * 构建初始化配置设置函数
+ * 该函数用于初始化WebSocket配置和本地配置信息
+ */
+async function buildInitConfigSettings() {
+    // 初始化WebSocket配置对象
+    configWs = {
+        action: actionMap.get(settings.action), // 从actionMap中获取对应的操作映射
+        group_id: settings.send_id,            // 设置群组ID
+        user_id: settings.send_id,             // 设置用户ID
+        ws_proxy_url: settings.ws_proxy_url,   // 设置WebSocket代理URL
+        ws_url: settings.ws_url,               // 设置WebSocket连接URL
+        ws_token: settings.ws_token,           // 设置WebSocket连接令牌
+        at_list: settings.at_list ? settings.at_list.split(",") : [] // 处理@用户列表，如果存在则按逗号分割，否则为空数组
+    }
+    // 初始化本地配置对象
+    local = {
+        token: null,  // 初始化token为null
+        uid: null,    // 初始化用户ID为null
+    }
+}
 /**
  *
  *
@@ -50,17 +77,79 @@ let configWs = {
  * 目前函数体为空，可以根据实际需求添加初始化逻辑
  */
 async function init() {
-    configWs = {
-        action: actionMap.get(settings.action),
-        group_id: settings.send_id,
-        user_id: settings.send_id,
-        ws_proxy_url: settings.ws_proxy_url,
-        ws_url: settings.ws_url,
-        ws_token: settings.ws_token,
-        at_list: settings.at_list ? settings.at_list.split(",") : []
+    await buildInitConfigSettings()
+    const uid = await ocrUID()
+    local.token = await getToken()
+    local.uid = uid
+    if (settings.wsNoticeType === "自定义通知") {
+        configWs = {
+            action: actionMap.get(settings.action),
+            group_id: settings.send_id,
+            user_id: settings.send_id,
+            ws_proxy_url: settings.ws_proxy_url,
+            ws_url: settings.ws_url,
+            ws_token: settings.ws_token,
+            at_list: settings.at_list ? settings.at_list.split(",") : []
+        }
+    } else {
+        //从bgi-tools获取ws信息
+        const configWsT = await pullAccessWsProxyConfig(local.uid, settings.http_api_access_ws_proxy)
+        if (!configWsT) {
+            // log.error("获取ws信息失败")
+            throw new Error("获取ws授权信息失败")
+        }
+        configWs = configWsT
+        configWs.at_list = configWsT.at_list ? configWsT.at_list.split(",") : []
     }
     log.debug(`configWs:{configWs}`, JSON.stringify(configWs))
     log.info('ws init success')
+}
+
+async function getToken() {
+    let token = {
+        name: "",
+        value: ""
+    }
+    const bgi_tools_token = settings.bgi_tools_token || "Authorization= "
+    // const list = Array.from(bgi_tools_token.split("=")).map(item => item.trim());
+    // config.bgi_tools.token.name = list[0]
+    // config.bgi_tools.token.value = list[1]
+
+    const separatorIndex = bgi_tools_token.indexOf("=");
+    if (separatorIndex !== -1) {
+        token.name = bgi_tools_token.substring(0, separatorIndex).trim();
+        token.value = bgi_tools_token.substring(separatorIndex + 1).trim();
+    } else {
+        token.name = bgi_tools_token.trim();
+        token.value = "";
+    }
+    try {
+        return token;
+    } finally {
+        local.token = token;
+    }
+}
+
+export async function pullAccessWsProxyConfig(uid, http_api) {
+    let token = local.token;
+    let value = {
+        "Content-Type": "application/json",
+        [token.name]: token.value
+    };
+    http_api += "?uid=" + uid
+    // 发送HTTP请求
+    const httpResponse = await http.request("GET", http_api, JSON.stringify({}), JSON.stringify(value));
+    // 检查响应状态码
+    if (httpResponse.status_code != 200) {
+        // 错误日志输出服务器响应
+        log.error(`服务器返回状态${httpResponse.headers} ${httpResponse.body}`);
+    } else {
+        let result_json = JSON.parse(httpResponse.body);
+        if (result_json?.code === 200) {
+            return result_json?.data
+        }
+    }
+    return undefined;
 }
 
 /**
@@ -75,7 +164,8 @@ async function init() {
  * @param {Array} atList - @用户列表
  * @returns {Promise<void>} 无返回值
  */
-async function send(wsProxyUrl, wsUrl, wsToken, action, group_id, user_id, textList, atList) {
+export async function send(wsProxyUrl, wsUrl, wsToken, action, group_id, user_id, textList, atList) {
+    const uid = local.uid
     // 构建基础JSON对象
     let json = {
         action: action,//send_group_msg群发、send_private_msg私聊
@@ -84,6 +174,7 @@ async function send(wsProxyUrl, wsUrl, wsToken, action, group_id, user_id, textL
         //     user_id: user_id,//QQ号
         //     message: []
         // }
+        uid: uid
     }
     // 根据动作类型设置不同的参数
     switch (action) {
@@ -122,7 +213,7 @@ async function send(wsProxyUrl, wsUrl, wsToken, action, group_id, user_id, textL
             }
         })
     }
-
+    let token = local.token;
     // 构建请求体
     let body = {
         url: wsUrl,
@@ -133,10 +224,13 @@ async function send(wsProxyUrl, wsUrl, wsToken, action, group_id, user_id, textL
     log.debug(`body:{key}`, JSON.stringify(body))
     // 信息日志记录HTTP请求开始
     log.info('http request start')
+    let value = {
+        "Content-Type": "application/json",
+        [token.name]: token.value
+    };
+
     // 发送HTTP请求
-    const httpResponse = await http.request("POST", wsProxyUrl, JSON.stringify(body), JSON.stringify({
-        "Content-Type": "application/json"
-    }));
+    const httpResponse = await http.request("POST", wsProxyUrl, JSON.stringify(body), JSON.stringify(value));
     // 检查响应状态码
     if (httpResponse.status_code != 200) {
         // 错误日志输出服务器响应
@@ -145,7 +239,7 @@ async function send(wsProxyUrl, wsUrl, wsToken, action, group_id, user_id, textL
     }
 }
 
-async function sendText(text) {
+export async function sendText(text) {
     await init();
     let action = configWs.action;
     let group_id = configWs.group_id;
@@ -159,11 +253,7 @@ async function sendText(text) {
     await send(wsProxyUrl, wsUrl, ws_token, action, group_id, user_id, textList, atList)
 }
 
-// this.wsUtil = {
+// export {
 //     send,
 //     sendText
 // }
-export {
-    send,
-    sendText
-}
