@@ -4,6 +4,7 @@ import { __name } from "../rolldown-runtime.js";
 /** 用户脚本设置 */
 const userConfig = {
   /** 每周任务相关设置 */
+  weeklyEnabled: settings.weeklyEnabled ?? true,
   room: settings.room || "20031486040",
   playbacks: (settings.playbacks || "美景音乐播放器结算.json")
     .replace(/，/g, ",")
@@ -18,13 +19,13 @@ const userConfig = {
   thisAttempts: Math.max(0, Number(settings.thisAttempts || "0")),
   /** 每日任务相关设置 */
   dailyEnabled: settings.dailyEnabled ?? false,
-  dailyRooms: (settings.dailyRooms || "24429042323,28644538672,33030477060,33030477060")
+  dailyRooms: (settings.dailyRooms || "24429042323,28644538672,45694132064")
     .replace(/，/g, ",")
     .split(",")
     .map((str) => str.trim())
     .filter(Boolean),
   dailyPlaybacks: (
-    settings.dailyPlaybacks || "通关回放1.json,通关回放2.json;30秒按1通关.json;30秒按4通关.json"
+    settings.dailyPlaybacks || "通关回放1.json,通关回放2.json;30秒按1通关.json;轰鸣木桩结算.json"
   )
     .replace(/，/g, ",")
     .replace(/；/g, ";")
