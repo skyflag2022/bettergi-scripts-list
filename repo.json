@@ -1,5 +1,5 @@
 {
-  "time": "20260904220716",
+  "time": "20260908221739",
   "url": "https://github.com/babalae/bettergi-scripts-list/archive/refs/heads/main.zip",
   "file": "repo.json",
   "indexes": [
@@ -18485,6 +18485,52 @@
                         "植绒草"
                       ],
                       "lastUpdated": "2026-08-20 10:19:50"
+                    }
+                  ]
+                },
+                {
+                  "name": "金蕨",
+                  "type": "directory",
+                  "children": [
+                    {
+                      "name": "01-金蕨-至冬-列车总站-10个.json",
+                      "type": "file",
+                      "version": "1.0",
+                      "author": "不瘦五十斤不改名",
+                      "authors": [
+                        {
+                          "name": "不瘦五十斤不改名",
+                          "link": "https://github.com/PanZic"
+                        }
+                      ],
+                      "description": "",
+                      "tags": [
+                        "bgi≥0.64.0",
+                        "地方特产",
+                        "至冬",
+                        "金蕨"
+                      ],
+                      "lastUpdated": "2026-09-05 17:37:00"
+                    },
+                    {
+                      "name": "02-金蕨-至冬-曙光车站-40个.json",
+                      "type": "file",
+                      "version": "1.0",
+                      "author": "不瘦五十斤不改名",
+                      "authors": [
+                        {
+                          "name": "不瘦五十斤不改名",
+                          "link": "https://github.com/PanZic"
+                        }
+                      ],
+                      "description": "",
+                      "tags": [
+                        "bgi≥0.64.0",
+                        "地方特产",
+                        "至冬",
+                        "金蕨"
+                      ],
+                      "lastUpdated": "2026-09-05 17:37:00"
                     }
                   ]
                 },
@@ -108019,7 +108065,7 @@
         {
           "name": "AutoCommissionNova",
           "type": "directory",
-          "version": "1.0.2",
+          "version": "1.0.3",
           "author": "DarkFlameMaster",
           "authors": [
             {
@@ -108035,7 +108081,7 @@
             "成就",
             "历练点"
           ],
-          "lastUpdated": "2026-08-19 13:56:47"
+          "lastUpdated": "2026-09-05 17:36:46"
         },
         {
           "name": "AutoCrystalfly",
@@ -108147,7 +108193,7 @@
         {
           "name": "AutoFishingTeyvat-Bait",
           "type": "directory",
-          "version": "1.0.4",
+          "version": "1.0.5",
           "author": "提瓦特钓鱼玳师",
           "authors": [
             {
@@ -108159,7 +108205,7 @@
           "tags": [
             "bgi≥0.55.0"
           ],
-          "lastUpdated": "2026-03-25 20:01:17"
+          "lastUpdated": "2026-09-05 23:07:05"
         },
         {
           "name": "AutoFontaineLeyLine",
@@ -108275,7 +108321,7 @@
         {
           "name": "AutoHoeingOneDragon",
           "type": "directory",
-          "version": "2.13.0",
+          "version": "2.13.1",
           "author": "mno",
           "authors": [
             {
@@ -108289,7 +108335,7 @@
           ],
           "description": "锄地一条龙~|~一站式解决自动化锄地，支持只拾取狗粮，请仔细阅读README.md后使用",
           "tags": [],
-          "lastUpdated": "2026-09-03 16:26:19"
+          "lastUpdated": "2026-09-08 00:03:54"
         },
         {
           "name": "AutoInstructorLock",
@@ -108580,7 +108626,7 @@
         {
           "name": "AutoWoodcutting-Pathing",
           "type": "directory",
-          "version": "3.0.10",
+          "version": "3.1.0",
           "author": "Tim",
           "authors": [
             {
@@ -108599,7 +108645,7 @@
             "地图追踪",
             "王树瑞佑"
           ],
-          "lastUpdated": "2026-09-03 17:38:19"
+          "lastUpdated": "2026-09-06 15:07:16"
         },
         {
           "name": "AutoYuanQin",
@@ -110105,7 +110151,7 @@
         {
           "name": "自动购买商品",
           "type": "directory",
-          "version": "3.5.10",
+          "version": "3.6.0",
           "author": "蜜柑魚",
           "authors": [
             {
@@ -110124,7 +110170,7 @@
             "购买商品",
             "模拟点击"
           ],
-          "lastUpdated": "2026-09-03 12:02:40"
+          "lastUpdated": "2026-09-05 23:44:53"
         },
         {
           "name": "自动领取成就奖励",

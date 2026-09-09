@@ -297,49 +297,37 @@
     }
 
     // 调用BGI任务读取背包中的木材数量并返回
-    async function woodInventory(woodsArray, numbersArray, woodInventoryNumber) {
-        log.info("先别急，先别动键盘鼠标，要去一个神秘的地方");
-        await genshin.Tp(1581.11, -112.45, "Enkanomiya", true);
-        await moveMouseBy(0, -114514);
-        await moveMouseBy(0, -1919810);
-        await sleep(1000);
-        if (woodsArray.length === 0) {
-            var resultDict = await dispatcher.runTask(new SoloTask("CountInventoryItem", { "gridScreenName": "Materials", "itemNames": woodType }));
-        } else {
-            var resultDict = await dispatcher.runTask(new SoloTask("CountInventoryItem", { "gridScreenName": "Materials", "itemNames": woodsArray }));
-        }
-
-        const keys = [];
-        const values = [];
-
+    async function woodInventory(woodsArray, numbersArray, woodInventoryNumber, targetInventoryNumber) {
         try {
-            for (const [key, value] of Object.entries(resultDict)) {
-                // 尝试将值转换为数字
-                const numValue = Number(value);
+            // 使用新的 CountInventoryItemParam 参数类
+            const param = new CountInventoryItemParam();
+            param.GridScreenName = GridScreenName.Materials;      // 背包“材料”页签
+            const itemNames = woodsArray.length === 0 ? woodType : woodsArray;
+            for (const name of itemNames) {
+                param.ItemNames.Add(name);                        // 逐个添加物品名
+            }
+            param.IconRecognitionMode = ItemIconRecognitionMode.Item; // 按物品图标识别
 
-                // 检查是否为有效数字（NaN 表示不是数字）
-                if (isNaN(numValue)) {
-                    console.warn(`跳过无效值: key=${key}, value=${value}`);
-                    continue;
-                }
+            // 调用 BGI 任务接口
+            const resultDict = await dispatcher.runCountInventoryItemTask(param);
 
-                // 执行计算逻辑
-                const diff = Math.min(woodInventoryNumber, 9999) - numValue; // 限制不超过背包上限
-                const result = diff > 0 ? diff : 0;
+            // 处理返回结果，计算还需砍伐的数量
+            const keys = [];
+            const values = [];
+            for (const name of itemNames) {
 
-                keys.push(key);
+                // 背包中没有该木材时，BGI可能不会返回该key
+                // 此时直接按库存0计算
+                const numValue = Number(resultDict?.[name] ?? 0);
+                if (isNaN(numValue)) continue;
+                const result = Math.min(Math.max(woodInventoryNumber, 0), 2000, Math.max(Math.min(targetInventoryNumber, 9999) - numValue, 0));
+                keys.push(name);
                 values.push(result);
             }
-            // log.info("成功检测到的木材" + keys.join(","));
-            // log.info("成功检测到的木材砍伐数量" + values.join(","));
-            if (keys.length === 0) {
-                log.warn("未识别到任何木材，使用预设数据");
-                return [woodsArray, numbersArray];
-            } else {
-                return [keys, values];
-            }
+            return [keys, values];
+
         } catch (err) {
-            log.warn("处理故障，使用预设数据")
+            log.warn(`处理故障，使用预设数据，错误：${err}`);
             return [woodsArray, numbersArray];
         }
     }
@@ -508,12 +496,13 @@
     let woodsArray = settings.woodsMultiCheckbox ? Array.from(settings.woodsMultiCheckbox) : [];
     let numbersArray = settings.numbers ? settings.numbers.split(/\s+/).map(Number).map(num => isNaN(num) ? 0 : num) : [];
     let woodInventoryNumber = settings.woodInventoryNumber ? (isNaN(settings.woodInventoryNumber) ? 2000 : settings.woodInventoryNumber) : 2000;
+    let targetInventoryNumber = settings.targetInventoryNumber ? (isNaN(settings.targetInventoryNumber) ? 9999 : settings.targetInventoryNumber) : 9999;
     let hasItto = settings.hasItto ? settings.hasItto : false;
     let theBoonOfTheElderTreeStatus = settings.theBoonOfTheElderTree ? await theElderTree() : true;
     // 判断是否装备王树瑞佑，如果未装备则跳过伐木
     if (theBoonOfTheElderTreeStatus) {
         // 判断是否开启背包检测，如果未开启或识别失败，则使用设置填入的数据或默认数据
-        let [woodsInventory, woodCountInventory] = settings.woodInventory ? await woodInventory(woodsArray, numbersArray, woodInventoryNumber) : [woodsArray, numbersArray];
+        let [woodsInventory, woodCountInventory] = settings.woodInventory ? await woodInventory(woodsArray, numbersArray, woodInventoryNumber, targetInventoryNumber) : [woodsArray, numbersArray];
 
         // 将识别到的木材种类和所需数量转换为映射表，并计算需要砍伐的次数
         mapWoodsToNumbers(woodsInventory, woodCountInventory, hasItto);
