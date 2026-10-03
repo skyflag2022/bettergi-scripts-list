@@ -178,6 +178,32 @@
       ]
     },
     {
+      "name": "阿罗夏-e",
+      "character": "阿罗夏",
+      "action": "keypress(e)",
+      "condition": {
+        "expression": "e-ready && since>15"
+      },
+      "ensureCast": false,
+      "index": 20
+    },
+    {
+      "name": "阿罗夏-q",
+      "character": "阿罗夏",
+      "action": "q,wait(0.1),ready",
+      "condition": {
+        "expression": "q-ready && since>18 && (since(20)>since(角色红血标记) || since(芙芙-q)<3)"
+      },
+      "ensureCast": false,
+      "index": 20,
+      "morePriorities": [
+        {
+          "expression": "q-ready && since>16",
+          "priority": 40
+        }
+      ]
+    },
+    {
       "name": "高优先级技能",
       "character": "",
       "action": "",
@@ -604,6 +630,16 @@
       "action": "e(hold)",
       "condition": {
         "expression": "since>8"
+      },
+      "ensureCast": false,
+      "index": 30
+    },
+    {
+      "name": "循环检查战斗结束",
+      "character": "",
+      "action": "check",
+      "condition": {
+        "expression": "battle-time(2) && last-exec(1)"
       },
       "ensureCast": false,
       "index": 30
