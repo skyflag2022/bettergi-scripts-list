@@ -26,13 +26,13 @@ function sendBufferedNotifications() {
 /**
  * 检测「手动填写数量」模式下是否误填了等级/情况字段。
  * 背景：顶部「数量填写模式」选「手动填写数量」时，等级/情况字段不生效，
- * 但用户很容易填了等级却忘了把模式切到「填写等级计算」，导致「明明选了等级却没生效」的困惑。
+ * 但用户很容易填了等级却忘了把模式切到「选择等级计算」，导致「明明选了等级却没生效」的困惑。
  * 命中时给出明确提示，引导用户切换顶部模式。
- * @param {boolean} useLevelCalc 是否已切换到「填写等级计算」模式
+ * @param {boolean} useLevelCalc 是否已切换到「选择等级计算」模式
  * @param {Array<[string, any]>} entries 形如 [["天赋书1 当前等级", "1-1-1"], ...]
  */
 function warnIfLevelFieldsIgnored(useLevelCalc, entries) {
-    if (useLevelCalc) return; // 已切到「填写等级计算」，正常生效，无需提示
+    if (useLevelCalc) return; // 已切到「选择等级计算」，正常生效，无需提示
 
     // 这些是「没改过/等同于未填」的状态：
     //   - 天赋等级文本框默认 "1-1-1"
@@ -48,11 +48,11 @@ function warnIfLevelFieldsIgnored(useLevelCalc, entries) {
     }
 
     if (touched.length > 0) {
-        log.warn(`检测到已填写等级/情况，但顶部「数量填写模式」不是「填写等级计算」，这些填写不会生效。`);
-        log.warn(`本次将按【手动填写数量】模式运行。若要按等级自动计算，请到设置里把顶部模式切换为「填写等级计算」后重跑。`);
-        addNotification(`⚠️ 提示：你填写了等级/情况(${touched.slice(0, 4).join('、')}${touched.length > 4 ? ' 等' : ''})，但顶部「数量填写模式」不是「填写等级计算」，将按手动填写的数量运行。`);
+        log.warn(`检测到已填写等级/情况，但顶部「数量填写模式」不是「选择等级计算」，这些填写不会生效。`);
+        log.warn(`本次将按【手动填写数量】模式运行。若要按等级自动计算，请到设置里把顶部模式切换为「选择等级计算」后重跑。`);
+        addNotification(`⚠️ 提示：你填写了等级/情况(${touched.slice(0, 4).join('、')}${touched.length > 4 ? ' 等' : ''})，但顶部「数量填写模式」不是「选择等级计算」，将按手动填写的数量运行。`);
     } else {
-        log.info(`当前为【手动填写数量】模式（顶部模式未切换）。若想改用「填写等级计算」，请到设置里把顶部模式切换过去。`);
+        log.info(`当前为【手动填写数量】模式（顶部模式未切换）。若想改用「选择等级计算」，请到设置里把顶部模式切换过去。`);
     }
 }
 
@@ -1515,10 +1515,10 @@ if(afterStamina< 20) skipCheckStamina = 0;
 if(!settings.unfairContractTerms) throw new Error('未签署霸王条款，无法使用');
 const completedTasks = await loadCompletedTasks();
 log.info(`已加载 ${Object.keys(completedTasks).length} 个已完成任务记录`);
-// 数量填写模式：settings.useLevelCalc 为「填写等级计算」时才启用等级换算
-// 兼容旧配置：老版本这里是 checkbox(true/false)，true 等价于「填写等级计算」
+// 数量填写模式：settings.useLevelCalc 为「选择等级计算」时才启用等级换算
+// 兼容旧配置：老版本这里是 checkbox(true/false)，true 等价于「选择等级计算」
 const levelMode = settings.useLevelCalc;
-const useLevelCalc = (levelMode === '填写等级计算') || (levelMode === true);
+const useLevelCalc = (levelMode === '选择等级计算') || (levelMode === true);
 log.info(useLevelCalc ? '【模式】根据等级/状态自动计算数量' : '【模式】手动填写数量');
 
 // 手动模式下若用户误填了等级字段，给出明确提示，避免「选了等级却没生效」的困惑

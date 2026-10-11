@@ -6,7 +6,7 @@
     "default": "手动填写数量",
     "options": [
       "手动填写数量",
-      "填写等级计算"
+      "选择等级计算"
     ]
   },
   {
@@ -42,6 +42,11 @@
     ]
   },
   {
+    "name": "sep_before_talentBookName0",
+    "type": "separator",
+    "label": "▼ 手动填写数量 ▼"
+  },
+  {
     "name": "talentBookRequireCounts0",
     "type": "input-text",
     "label": "天赋书1 所需数量，绿-蓝-紫\n888天赋 9-63-30\n999天赋 9-63-66\n全10天赋 9-63-114"
@@ -49,7 +54,7 @@
   {
     "name": "sep_talentBookRequireCounts0",
     "type": "separator",
-    "label": "▼ 等级计算 ▼"
+    "label": "▼ 选择等级计算 ▼"
   },
   {
     "name": "talentCurrent0",
@@ -96,6 +101,11 @@
     ]
   },
   {
+    "name": "sep_before_talentBookName1",
+    "type": "separator",
+    "label": "▼ 手动填写数量 ▼"
+  },
+  {
     "name": "talentBookRequireCounts1",
     "type": "input-text",
     "label": "天赋书2 所需数量(绿-蓝-紫)"
@@ -103,7 +113,7 @@
   {
     "name": "sep_talentBookRequireCounts1",
     "type": "separator",
-    "label": "▼ 等级计算 ▼"
+    "label": "▼ 选择等级计算 ▼"
   },
   {
     "name": "talentCurrent1",
@@ -150,6 +160,11 @@
     ]
   },
   {
+    "name": "sep_before_talentBookName2",
+    "type": "separator",
+    "label": "▼ 手动填写数量 ▼"
+  },
+  {
     "name": "talentBookRequireCounts2",
     "type": "input-text",
     "label": "天赋书3 所需数量(绿-蓝-紫)"
@@ -157,7 +172,7 @@
   {
     "name": "sep_talentBookRequireCounts2",
     "type": "separator",
-    "label": "▼ 等级计算 ▼"
+    "label": "▼ 选择等级计算 ▼"
   },
   {
     "name": "talentCurrent2",
@@ -204,6 +219,11 @@
     ]
   },
   {
+    "name": "sep_before_weaponName0",
+    "type": "separator",
+    "label": "▼ 手动填写数量 ▼"
+  },
+  {
     "name": "weaponMaterialRequireCounts0",
     "type": "input-text",
     "label": "武器材料1 所需数量，绿-蓝-紫-金\n五星拉满 5-14-14-6\n四星拉满 3-9-9-4\n三星拉满 2-6-6-3"
@@ -211,7 +231,7 @@
   {
     "name": "sep_weaponMaterialRequireCounts0",
     "type": "separator",
-    "label": "▼ 星级/等级计算 ▼"
+    "label": "▼ 选择星级/等级计算 ▼"
   },
   {
     "name": "weaponStar0",
@@ -297,6 +317,11 @@
     ]
   },
   {
+    "name": "sep_before_weaponName1",
+    "type": "separator",
+    "label": "▼ 手动填写数量 ▼"
+  },
+  {
     "name": "weaponMaterialRequireCounts1",
     "type": "input-text",
     "label": "武器材料2 所需数量(绿-蓝-紫-金)"
@@ -304,7 +329,7 @@
   {
     "name": "sep_weaponMaterialRequireCounts1",
     "type": "separator",
-    "label": "▼ 星级/等级计算 ▼"
+    "label": "▼ 选择星级/等级计算 ▼"
   },
   {
     "name": "weaponStar1",
@@ -390,6 +415,11 @@
     ]
   },
   {
+    "name": "sep_before_weaponName2",
+    "type": "separator",
+    "label": "▼ 手动填写数量 ▼"
+  },
+  {
     "name": "weaponMaterialRequireCounts2",
     "type": "input-text",
     "label": "武器材料3 所需数量(绿-蓝-紫-金)"
@@ -397,7 +427,7 @@
   {
     "name": "sep_weaponMaterialRequireCounts2",
     "type": "separator",
-    "label": "▼ 星级/等级计算 ▼"
+    "label": "▼ 选择星级/等级计算 ▼"
   },
   {
     "name": "weaponStar2",
@@ -502,6 +532,11 @@
     ]
   },
   {
+    "name": "sep_before_bossName0",
+    "type": "separator",
+    "label": "▼ 手动填写数量 ▼"
+  },
+  {
     "name": "bossRequireCounts0",
     "type": "input-text",
     "label": "首领1 所需材料数量\n1级到90级共需 46 个材料"
@@ -509,7 +544,7 @@
   {
     "name": "sep_bossRequireCounts0",
     "type": "separator",
-    "label": "▼ 等级计算 ▼"
+    "label": "▼ 选择等级计算 ▼"
   },
   {
     "name": "bossCurrent0",
@@ -603,6 +638,11 @@
     ]
   },
   {
+    "name": "sep_before_bossName1",
+    "type": "separator",
+    "label": "▼ 手动填写数量 ▼"
+  },
+  {
     "name": "bossRequireCounts1",
     "type": "input-text",
     "label": "首领2 所需材料数量"
@@ -610,7 +650,7 @@
   {
     "name": "sep_bossRequireCounts1",
     "type": "separator",
-    "label": "▼ 等级计算 ▼"
+    "label": "▼ 选择等级计算 ▼"
   },
   {
     "name": "bossCurrent1",
@@ -704,6 +744,11 @@
     ]
   },
   {
+    "name": "sep_before_bossName2",
+    "type": "separator",
+    "label": "▼ 手动填写数量 ▼"
+  },
+  {
     "name": "bossRequireCounts2",
     "type": "input-text",
     "label": "首领3 所需材料数量"
@@ -711,7 +756,7 @@
   {
     "name": "sep_bossRequireCounts2",
     "type": "separator",
-    "label": "▼ 等级计算 ▼"
+    "label": "▼ 选择等级计算 ▼"
   },
   {
     "name": "bossCurrent2",
