@@ -1568,7 +1568,10 @@ if (useLevelCalc) {
     const weaponStar    = eval(`settings.weaponStar${i}`)    || "四星";
     const weaponCurrent = eval(`settings.weaponCurrent${i}`) || "无";
     const weaponTarget  = eval(`settings.weaponTarget${i}`)  || "无";
-    if (weaponTarget === "无") {
+    if (weaponStar === "无") {
+        log.info(`武器材料${i+1}【${weaponName}】星级未选择（为「无」），视为无需刷取，跳过执行`);
+        weaponRequireCounts = null;
+    } else if (weaponTarget === "无") {
         log.info(`武器材料${i+1}【${weaponName}】目标情况未选择（为「无」），视为无需刷取，跳过执行`);
         weaponRequireCounts = null;
     } else {
