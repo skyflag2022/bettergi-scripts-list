@@ -196,6 +196,7 @@ function calculateBossCount(currentOption, targetOption) {
 
 /**
  * 计算天赋书数量（绿-蓝-紫）。
+ * 注：当前/目标等级解析失败时均兜底为 1-1-1（即不刷取）。
  * @param {string} currentTalents 当前技能等级，如 "1-1-1"
  * @param {string} targetTalents  目标技能等级，如 "10-10-10"
  * @returns {number[]} [绿, 蓝, 紫]
@@ -203,7 +204,7 @@ function calculateBossCount(currentOption, targetOption) {
 function calculateTalentBookCounts(currentTalents, targetTalents) {
     const rules = getMaterialRules();
     const cur = parseTalentLevels(currentTalents, [1, 1, 1]);
-    const tgt = parseTalentLevels(targetTalents, [1, 10, 10]);
+    const tgt = parseTalentLevels(targetTalents, [1, 1, 1]);
     const totals = [0, 0, 0];
 
     for (let i = 0; i < 3; i++) {
