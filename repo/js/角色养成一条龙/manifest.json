@@ -2,6 +2,7 @@
   "manifest_version": 1,
   "name": "角色养成一条龙",
   "version": "2.0",
+  "bgi_version": "0.62.0",
   "description": "详见readme.md",
   "authors": [
     {
